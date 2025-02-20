@@ -53,8 +53,8 @@ export function SignInView() {
       if (user && !tokenFetched) { 
         console.log('User detected:', user);
         await fetchAccessToken();
-        setTokenFetched(true);
-        router.push('/');
+        setTokenFetched(true); 
+        router.replace('/');
       }
     };
   
