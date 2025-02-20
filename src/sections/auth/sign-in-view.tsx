@@ -58,10 +58,6 @@ export function SignInView() {
   if (isLoading) {
     return "Loading...";
   }
-
-  if (user) {
-    return null;
-  }
   
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
