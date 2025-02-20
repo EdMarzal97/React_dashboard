@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useAuth } from '@workos-inc/authkit-react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -16,13 +17,33 @@ import { Iconify } from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export function SignInView() {
+
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { user, signIn, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (window.location.pathname === '/sign-in') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const context = searchParams.get('context') ?? undefined;
+      signIn({ context });
+    }
+  }, [signIn]);
+
   const handleSignIn = useCallback(() => {
+    signIn();
+  }, [signIn]);
+
+  if (isLoading) {
+    return "Loading...";
+  }
+
+  if (user) {
     router.push('/');
-  }, [router]);
+    return null;
+  }
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
