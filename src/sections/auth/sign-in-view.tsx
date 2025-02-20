@@ -21,6 +21,7 @@ export function SignInView() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [tokenFetched, setTokenFetched] = useState(false);
 
   const { user, signIn, isLoading, getAccessToken } = useAuth();
 
@@ -33,11 +34,9 @@ export function SignInView() {
     }
   }, [signIn]);
 
-
   const handleSignIn = useCallback(() => {
     signIn();
   }, [signIn]);
-
 
   const fetchAccessToken = useCallback(async () => {
     try {
@@ -48,12 +47,19 @@ export function SignInView() {
     }
   }, [getAccessToken]);
 
+
   useEffect(() => {
-    if (user) {
-      fetchAccessToken();
-      router.push('/');
-    }
-  }, [user, router, fetchAccessToken]);
+    const fetchTokenAndRedirect = async () => {
+      if (user && !tokenFetched) { 
+        console.log('User detected:', user);
+        await fetchAccessToken();
+        setTokenFetched(true);
+        router.push('/');
+      }
+    };
+  
+    fetchTokenAndRedirect();
+  }, [user, router, tokenFetched, fetchAccessToken]);
 
   if (isLoading) {
     return "Loading...";
