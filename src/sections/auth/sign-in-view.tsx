@@ -22,7 +22,8 @@ export function SignInView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const { user, signIn, isLoading } = useAuth();
+  const { user, signIn, isLoading, getAccessToken } = useAuth();
+
 
   useEffect(() => {
     if (window.location.pathname === '/sign-in') {
@@ -32,19 +33,36 @@ export function SignInView() {
     }
   }, [signIn]);
 
+
   const handleSignIn = useCallback(() => {
     signIn();
   }, [signIn]);
+
+
+  const fetchAccessToken = useCallback(async () => {
+    try {
+      const accessToken = await getAccessToken();
+      console.log('Access Token:', accessToken);
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+    }
+  }, [getAccessToken]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAccessToken();
+      router.push('/');
+    }
+  }, [user, router, fetchAccessToken]);
 
   if (isLoading) {
     return "Loading...";
   }
 
   if (user) {
-    router.push('/');
     return null;
   }
-
+  
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
       <TextField
