@@ -1,6 +1,5 @@
 import { useAuth } from '@workos-inc/authkit-react';
 import { useState, useEffect, useCallback } from 'react';
-
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
@@ -9,57 +8,36 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
-  const [tokenFetched, setTokenFetched] = useState(false);
-
   const { user, signIn, isLoading, getAccessToken } = useAuth();
-
-
-  useEffect(() => {
-    if (window.location.pathname === '/sign-in') {
-      const searchParams = new URLSearchParams(window.location.search);
-      const context = searchParams.get('context') ?? undefined;
-      signIn({ context });
-    }
-  }, [signIn]);
 
   const handleSignIn = useCallback(() => {
     signIn();
   }, [signIn]);
 
-  const fetchAccessToken = useCallback(async () => {
+  const fetchAccessTokenAndRedirect = useCallback(async () => {
     try {
       const accessToken = await getAccessToken();
       console.log('Access Token:', accessToken);
+      router.replace('/');
     } catch (error) {
       console.error('Failed to get access token:', error);
     }
-  }, [getAccessToken]);
-
+  }, [getAccessToken, router]);
 
   useEffect(() => {
-    const fetchTokenAndRedirect = async () => {
-      if (user && !tokenFetched) { 
-        console.log('User detected:', user);
-        await fetchAccessToken();
-        setTokenFetched(true); 
-        router.replace('/');
-      }
-    };
-  
-    fetchTokenAndRedirect();
-  }, [user, router, tokenFetched, fetchAccessToken]);
+    if (user) {
+      console.log('User detected:', user);
+      fetchAccessTokenAndRedirect();
+    }
+  }, [user, fetchAccessTokenAndRedirect]);
 
   if (isLoading) {
     return "Loading...";
